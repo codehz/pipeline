@@ -1,5 +1,5 @@
 import { describe, expect, it } from "bun:test";
-import { pipeline } from "../index";
+import { pipeline, type SyncPass } from "../index";
 
 describe("pipeline builder", () => {
   it("merges passes and preserves typing at runtime", () => {
@@ -107,5 +107,32 @@ describe("pipeline builder", () => {
     expect(res.input).toBe(1);
     expect(res.output).toBe(21);
     expect(res.log).toBe("1 => 21");
+  });
+
+  it("supports void return type (no new fields)", () => {
+    const fn = pipeline<{ a: number }>()
+      .addPass((env): void => {
+        // side effect or no-op
+        return;
+      })
+      .build();
+
+    const res = fn({ a: 1 });
+    expect(res).toEqual({ a: 1 });
+  });
+
+  it("supports void input type in object pass", () => {
+    const voidPass: SyncPass<void, void> = {
+      run() {
+        // no-op
+      }
+    };
+
+    const fn = pipeline<{ a: number }>()
+      .addPass(voidPass)
+      .build();
+
+    const res = fn({ a: 1 });
+    expect(res).toEqual({ a: 1 });
   });
 });
