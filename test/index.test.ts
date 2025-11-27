@@ -135,4 +135,31 @@ describe("pipeline builder", () => {
     const res = fn({ a: 1 });
     expect(res).toEqual({ a: 1 });
   });
+
+  it("allows calling without arguments for empty input", () => {
+    const fn = pipeline<{}>()
+      .addPass(() => ({ output: 1 }))
+      .build();
+
+    const res = fn();
+    expect(res.output).toBe(1);
+  });
+
+  it("allows calling without arguments for optional input", () => {
+    const fn = pipeline<{ a?: number }>()
+      .addPass((env) => ({ output: (env.a || 0) + 1 }))
+      .build();
+
+    const res = fn();
+    expect(res.output).toBe(1);
+  });
+
+  it("allows calling without arguments for default input", () => {
+    const fn = pipeline() // default Input is {}
+      .addPass(() => ({ output: 1 }))
+      .build();
+
+    const res = fn();
+    expect(res.output).toBe(1);
+  });
 });

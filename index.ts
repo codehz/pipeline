@@ -104,14 +104,20 @@ export class PipelineBuilder<
   // Overloads: if builder is async at compile time, build() returns an
   // async function; otherwise a sync function. Implementation detects
   // thenables at runtime and switches to Promise-based execution when needed.
-  build(this: PipelineBuilder<Input, Env, false>): (input: Input) => Env;
+  build(
+    this: PipelineBuilder<Input, Env, false>
+  ): {} extends Input ? (input?: Input) => Env : (input: Input) => Env;
   build(
     this: PipelineBuilder<Input, Env, true>
-  ): (input: Input) => Promise<Env>;
+  ): {} extends Input
+    ? (input?: Input) => Promise<Env>
+    : (input: Input) => Promise<Env>;
   build(
     this: PipelineBuilder<Input, Env, boolean>
-  ): (input: Input) => Env | Promise<Env>;
-  build(): (input: Input) => Env | Promise<Env> {
+  ): {} extends Input
+    ? (input?: Input) => Env | Promise<Env>
+    : (input: Input) => Env | Promise<Env>;
+  build(): (input?: any) => Env | Promise<Env> {
     const passes = this.passes.slice();
 
     // Detects thenables/Promises by checking a `.then` function.
@@ -120,8 +126,8 @@ export class PipelineBuilder<
       (typeof v === "object" || typeof v === "function") &&
       typeof v.then === "function";
 
-    return (input: Input) => {
-      let env: PlainObject = { ...input };
+    return (input?: any) => {
+      let env: PlainObject = { ...(input || {}) };
 
       for (let i = 0; i < passes.length; i++) {
         const pass = passes[i]!;
