@@ -25,7 +25,7 @@ jobs:
         run: bun run release ${{ inputs.version }}
 
       - name: Publish to npm
-        run: bun publish
+        run: bun publish --access public
         working-directory: dist
         env:
           NPM_CONFIG_TOKEN: ${{ secrets.NPM_TOKEN }}
