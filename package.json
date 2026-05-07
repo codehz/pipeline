@@ -23,7 +23,8 @@
   "files": [
     "dist",
     "README.md",
-    "LICENSE"
+    "LICENSE",
+    "index.ts"
   ],
   "repository": {
     "type": "git",
